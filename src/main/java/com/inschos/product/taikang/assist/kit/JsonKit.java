@@ -49,4 +49,14 @@ public class JsonKit {
             return null;
         }
     }
+
+    public static boolean isJSONValid(String jsonInString) {
+        try {
+            final ObjectMapper mapper = new ObjectMapper();
+            mapper.readTree(jsonInString);
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
+    }
 }

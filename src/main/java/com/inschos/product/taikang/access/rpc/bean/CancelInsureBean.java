@@ -1,4 +1,4 @@
-package com.inschos.product.taikang.access.http.controller.bean;
+package com.inschos.product.taikang.access.rpc.bean;
 
 public class CancelInsureBean {
 

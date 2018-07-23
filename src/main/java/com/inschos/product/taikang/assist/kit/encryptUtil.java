@@ -136,7 +136,7 @@ public class encryptUtil {
      * @param _return
      * @return
      */
-    public String getEncryptStr(String key,String _in)
+    public static String getEncryptStr(String key,String _in)
     {
         /** 加密报文 **/
         byte[] es = encryptStr(key.getBytes(), _in.getBytes());
@@ -150,7 +150,7 @@ public class encryptUtil {
      * @param _return
      * @return
      */
-    public String getDecryptStr(String key,String _return)
+    public static String getDecryptStr(String key,String _return)
     {
         /** 加密报文 **/
         byte[] es = decryptStr(key.getBytes(), fromString(_return));

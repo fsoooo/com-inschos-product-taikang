@@ -1,17 +1,17 @@
-package com.inschos.product.taikang.access.http.controller.bean;
+package com.inschos.product.taikang.access.rpc.bean;
 
 public class CommonBean {
 
-    private static final String testOrgid = "5466";
-    private static final String testKey = "bfafa2d09dba76a7be9464c8";
-    private static final String testPlancode = "10100878";
-    private static final String testPeriod = "17";
-    private static final String testPremium = "20";
+    public static final String testOrgid = "5466";
+    public static final String testKey = "bfafa2d09dba76a7be9464c8";
+    public static final String testPlancode = "10100878";
+    public static final String testPeriod = "17";
+    public static final String testPremium = "20";
 
     //接口地址
-    private static final String insureUrl = "";//核保,缴费交易接口地址
-    private static final String cancelUrl = "";//撤单交易接口地址
-    private static final String insureSign = "";//签单交易接口地址
+    public static final String insureUrl = "";//核保,缴费交易接口地址
+    public static final String cancelUrl = "";//撤单交易接口地址
+    public static final String insureSign = "";//签单交易接口地址
 
     //性别(sex)
     public final static String man = "0";
