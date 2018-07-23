@@ -21,7 +21,7 @@ import java.util.List;
 import static com.inschos.product.taikang.access.rpc.bean.CommonBean.*;
 
 @Service
-public class IntersAction implements IntersService,InsureService {
+public class IntersAction implements IntersService, InsureService {
 
     private static final Logger logger = Logger.getLogger(IntersAction.class);
 
@@ -72,50 +72,50 @@ public class IntersAction implements IntersService,InsureService {
     /**
      * 预投保
      *
-     * @param requset
+     * @param request
      * @return
      */
     @Override
-    public RpcResponse<RspPreInsureBean> preInsure(InsureBean requset) {
+    public RpcResponse<RspPreInsureBean> preInsure(InsureBean request) {
         return null;
     }
 
     /**
      * 核保
      *
-     * @param requset
+     * @param request
      * @return
      */
     @Override
-    public  RpcResponse<RspInsureBean> insure(InsureBean requset) {
+    public RpcResponse<RspInsureBean> insure(InsureBean request) {
         RpcResponse response = new RpcResponse();
         String interName = "核保接口";
-        if(requset==null){
+        if (request == null) {
             response.code = 500;
             response.message = interName + "参数解析失败";
             return response;
         }
         BuyInsureBean.Requset buyRequest = new BuyInsureBean.Requset();
-        buyRequest.orderno = requset.warrantyUuid;//订单信息,订单号小于等于20位
+        buyRequest.orderno = request.warrantyUuid;//订单信息,订单号小于等于20位
         buyRequest.orderfrom = "";//订单来源
-        buyRequest.Plancode = requset.productCode;//产品编码
+        buyRequest.Plancode = request.productCode;//产品编码
         buyRequest.orgid = testOrgid;//系统编码
-        buyRequest.startdate = requset.startTime;//生效时间
-        buyRequest.applydate = requset.tradeTime+"";//投保时间
-        buyRequest.period = requset.insurePeriod+"";//保险期间
-        buyRequest.premium = requset.premium;//保费
-        buyRequest.amnt = requset.amount;//保额
+        buyRequest.startdate = request.startTime;//生效时间
+        buyRequest.applydate = request.tradeTime + "";//投保时间
+        buyRequest.period = request.insurePeriod + "";//保险期间
+        buyRequest.premium = request.premium;//保费
+        buyRequest.amnt = request.amount;//保额
         //投保人信息
-        buyRequest.name = requset.policyholder.name;
-        buyRequest.cidtype = requset.policyholder.cardType+"";
-        buyRequest.cid = requset.policyholder.cardCode;
-        buyRequest.sex = requset.policyholder.sex+"";//代码表见附录。
-        buyRequest.birth = requset.policyholder.birthday;//格式：yyyy-mm-dd
-        buyRequest.mobile = requset.policyholder.phone;
-        buyRequest.email = requset.policyholder.email;
+        buyRequest.name = request.policyholder.name;
+        buyRequest.cidtype = request.policyholder.cardType + "";
+        buyRequest.cid = request.policyholder.cardCode;
+        buyRequest.sex = request.policyholder.sex + "";//代码表见附录。
+        buyRequest.birth = request.policyholder.birthday;//格式：yyyy-mm-dd
+        buyRequest.mobile = request.policyholder.phone;
+        buyRequest.email = request.policyholder.email;
         //被保人信息
         PersonBean personBean = new PersonBean();
-        for (PersonBean recognizee : requset.recognizees) {
+        for (PersonBean recognizee : request.recognizees) {
             personBean.relation = recognizee.relation;//被保人与投保人关系 码表
             personBean.name = recognizee.name;
             personBean.cardType = recognizee.cardType;//被保人证件类型
@@ -123,19 +123,19 @@ public class IntersAction implements IntersService,InsureService {
             personBean.sex = recognizee.sex;
             personBean.birthday = recognizee.birthday;
         }
-        buyRequest.insurerelation = personBean.relation+"";//被保人与投保人关系 码表
+        buyRequest.insurerelation = personBean.relation + "";//被保人与投保人关系 码表
         buyRequest.insurename = personBean.name;
-        buyRequest.insurecidtype = personBean.cardType+"";//被保人证件类型
+        buyRequest.insurecidtype = personBean.cardType + "";//被保人证件类型
         buyRequest.insurecid = personBean.cardCode;
-        buyRequest.insuresex = personBean.sex+"";
+        buyRequest.insuresex = personBean.sex + "";
         buyRequest.insurebirth = personBean.birthday;
         //受益人信息
-        buyRequest.bnfrelation = requset.beneficiary.relation+"";
-        buyRequest.bnfname = requset.beneficiary.name;
-        buyRequest.bnfcidtype = requset.beneficiary.cardType+"";
-        buyRequest.bnfcid = requset.beneficiary.cardCode;
-        buyRequest.bnfsex = requset.beneficiary.sex+"";
-        buyRequest.bnfbirth = requset.beneficiary.birthday;
+        buyRequest.bnfrelation = request.beneficiary.relation + "";
+        buyRequest.bnfname = request.beneficiary.name;
+        buyRequest.bnfcidtype = request.beneficiary.cardType + "";
+        buyRequest.bnfcid = request.beneficiary.cardCode;
+        buyRequest.bnfsex = request.beneficiary.sex + "";
+        buyRequest.bnfbirth = request.beneficiary.birthday;
         //其他信息
         buyRequest.agentno = "52589745";//业务员编码
         buyRequest.agenttype = "AG";//业务员渠道
@@ -147,8 +147,8 @@ public class IntersAction implements IntersService,InsureService {
         List<BuyInsureBean.PolicySpldatas> policySpldatas = new ArrayList<>();
         policySpldatas.add(policySpldata);
         buyRequest.policyspldatas = policySpldatas;
-        String data = encryptUtil.getEncryptStr(testOrgid,JsonKit.bean2Json(buyRequest));
-        BaseResponseBean interResponse =  httpRequest(insureUrl, data, interName);
+        String data = encryptUtil.getEncryptStr(testOrgid, JsonKit.bean2Json(buyRequest));
+        BaseResponseBean interResponse = httpRequest(insureUrl, data, interName);
         BuyInsureBean.Response buyResponse = new BuyInsureBean.Response();
         return response;
     }
@@ -156,34 +156,64 @@ public class IntersAction implements IntersService,InsureService {
     /**
      * 缴费
      *
-     * @param requset
+     * @param request
      * @return
      */
     @Override
-    public RpcResponse<RspPayBean> pay(PayBean requset) {
-        return null;
+    public RpcResponse<RspPayBean> pay(PayBean request) {
+        RpcResponse response = new RpcResponse();
+        String interName = "缴费接口";
+        if (request == null) {
+            response.code = 500;
+            response.message = interName + "参数解析失败";
+            return response;
+        }
+        PayInsureBean.Requset payRequest = new PayInsureBean.Requset();
+        payRequest.orderno = request.aplNo;
+        payRequest.orgid = testOrgid;
+        payRequest.policyno = request.aplNo;
+        String data = encryptUtil.getEncryptStr(testOrgid, JsonKit.bean2Json(payRequest));
+        BaseResponseBean interResponse = httpRequest(insureUrl, data, interName);
+        PayInsureBean.Response buyResponse = new PayInsureBean.Response();
+        return response;
     }
 
     /**
-     * 承保
+     * 承保(请求参数同核保)
      *
-     * @param requset
+     * @param request
      * @return
      */
     @Override
-    public RpcResponse<RspIssueBean> issue(IssueBean requset) {
+    public RpcResponse<RspIssueBean> issue(IssueBean request) {
         return null;
     }
 
     /**
      * 撤保
      *
-     * @param requset
+     * @param request
      * @return
      */
     @Override
-    public BaseResponseBean cancelInsure(CancelInsureBean.Requset requset) {
-        return null;
+    public BaseResponseBean cancelInsure(CancelInsureBean.Requset request) {
+        BaseResponseBean response = new BaseResponseBean();
+        String interName = "缴费接口";
+        if (request == null) {
+            return json(BaseResponseBean.CODE_FAILURE, interName + "参数解析失败", response);
+        }
+        CancelInsureBean.Requset cancelRequest = new CancelInsureBean.Requset();
+        cancelRequest.orderno = request.orderno;//订单号
+        cancelRequest.orderfrom = request.orderfrom;//订单来源
+        cancelRequest.plancode = request.plancode;//产品编码
+        cancelRequest.orgid = request.orgid;//系统编码
+        cancelRequest.policyno = request.policyno;//保单号
+        cancelRequest.insurename = request.insurename;//被保人姓名
+        cancelRequest.insurecid = request.insurecid;//被保人证件号码
+        String data = encryptUtil.getEncryptStr(testOrgid, JsonKit.bean2Json(cancelRequest));
+        BaseResponseBean interResponse = httpRequest(cancelUrl, data, interName);
+        PayInsureBean.Response buyResponse = new PayInsureBean.Response();
+        return response;
     }
 
 }
