@@ -58,4 +58,28 @@ public class IntersController {
     public String buyInsure(HttpServletRequest httpServletRequest) {
         return intersAction.buyInsure(httpServletRequest);
     }
+
+    /**
+     * 支付查询接口
+     *
+     * @param httpServletRequest
+     * @return
+     */
+    @RequestMapping("/payQuery/**")
+    @ResponseBody
+    public String payQuery(HttpServletRequest httpServletRequest) {
+        return intersAction.payQuery(httpServletRequest);
+    }
+
+    /**
+     * 支付通知(回调)
+     *
+     * @param httpServletRequest
+     * @return
+     */
+    @RequestMapping("/payCallBack/**")
+    @ResponseBody
+    public String payCallBack(HttpServletRequest httpServletRequest) {
+        return intersAction.payCallBack(httpServletRequest);
+    }
 }
