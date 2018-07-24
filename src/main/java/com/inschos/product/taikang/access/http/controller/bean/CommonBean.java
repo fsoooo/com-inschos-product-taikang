@@ -7,6 +7,8 @@ public class CommonBean {
     public static final String plancode = "10100878";
     public static final int period = 17;
     public static final String premium = "20";
+    public static final String version = "1.0";
+    public static final String format = "JSON";
 
     //接口地址
     public static final String checkInsureUrl = "http://119.253.81.69:8080/soa/api/v1.0/service/E001";//核保

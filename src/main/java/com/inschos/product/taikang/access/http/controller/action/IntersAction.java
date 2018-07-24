@@ -3,19 +3,19 @@ package com.inschos.product.taikang.access.http.controller.action;
 import com.inschos.product.taikang.access.http.controller.bean.BaseResponseBean;
 import com.inschos.product.taikang.access.http.controller.bean.BuyInsureBean;
 import com.inschos.product.taikang.access.http.controller.bean.PayInsureBean;
-import com.inschos.product.taikang.assist.kit.HttpClientKit;
-import com.inschos.product.taikang.assist.kit.HttpKit;
-import com.inschos.product.taikang.assist.kit.JsonKit;
-import com.inschos.product.taikang.assist.kit.encryptUtil;
+import com.inschos.product.taikang.assist.kit.*;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.inschos.product.taikang.access.http.controller.bean.CommonBean.*;
+import static com.inschos.product.taikang.access.http.controller.bean.RsaEncryBean.*;
 
 @Component
 public class IntersAction extends BaseAction {
@@ -43,15 +43,10 @@ public class IntersAction extends BaseAction {
             if (result == null) {
                 return responseBean(BaseResponseBean.CODE_FAILURE, interName + "接口请求失败1", response);
             }
-            result = encryptUtil.getDecryptStr(key, result);
-            if (!isJSONValid(result)) {
-                return responseBean(BaseResponseBean.CODE_FAILURE, interName + "接口返回报文解析失败", response);
-            }
             response.data = result;
             return responseBean(BaseResponseBean.CODE_SUCCESS, interName + "接口请求成功", response);
         } catch (IOException e) {
             e.printStackTrace();
-
             return responseBean(BaseResponseBean.CODE_FAILURE, interName + "接口请求失败2", response);
         }
     }
@@ -116,6 +111,14 @@ public class IntersAction extends BaseAction {
         logger.info(interName+"请求数据："+requestData);
         String data = encryptUtil.getEncryptStr(key, requestData);
         BaseResponseBean interResponse = httpRequest(checkInsureUrl, orgid+"|"+data, interName);
+        if(interResponse.code!=200){
+            return json(BaseResponseBean.CODE_FAILURE, interName + "接口请求失败", response);
+        }
+        String result = interResponse.data.toString();
+        result = encryptUtil.getDecryptStr(key, result);
+        if (!isJSONValid(result)) {
+            return json(BaseResponseBean.CODE_FAILURE, interName + "接口返回报文解析失败", response);
+        }
         logger.info("返回数据"+JsonKit.bean2Json(interResponse));
         BuyInsureBean.Response buyResponse = new BuyInsureBean.Response();
         response.data = interResponse;
@@ -136,10 +139,53 @@ public class IntersAction extends BaseAction {
             return json(BaseResponseBean.CODE_FAILURE, interName + "参数解析失败", response);
         }
         PayInsureBean.Requset payRequest = new PayInsureBean.Requset();
-        payRequest = request;
-        String data = encryptUtil.getEncryptStr(orgid+"", JsonKit.bean2Json(payRequest));
+        payRequest.businessType = request.businessType;
+        payRequest.cmsSystemSource = request.cmsSystemSource;
+        payRequest.cmsBusinessType = request.cmsBusinessType;
+        payRequest.cmsVersion = request.cmsVersion;
+        payRequest.cmsFormat = request.cmsFormat;
+        payRequest.cmsPayChannel = request.cmsPayChannel;
+        payRequest.cmsPayTag = request.cmsPayTag;
+        payRequest.orderId = request.orderId;
+        payRequest.transactionId = request.transactionId;
+        payRequest.requestDateTime = request.requestDateTime;
+        payRequest.currencyCode = request.currencyCode;
+        payRequest.money = request.money;
+        payRequest.summary = request.summary;
+        payRequest.isCheck = request.isCheck;
+        payRequest.accountName = request.accountName;
+        payRequest.certificateType = request.certificateType;
+        payRequest.certificateNo = request.certificateNo;
+        payRequest.mobile = request.mobile;
+        payRequest.isLimitCreditPay = "0";
+        payRequest.openId = "";
+        payRequest.deviceInfo = request.deviceInfo;//应用类型
+        payRequest.mchAppId = request.mchAppId;//应用标识(H5支付必填)
+        payRequest.mchAppName = request.mchAppName;//应用名(H5支付必填)
+        payRequest.isRaw = "";
+        payRequest.successURL = request.successURL;
+        payRequest.failURL = "";
+        RSAUtil rsaUtil = new RSAUtil();
+        ByteKit byteKit = new ByteKit();
+        RSAPublicKey recoveryPubKey = rsaUtil.generateRSAPublicKey(pubModBytes, pubPubExpBytes);
+        RSAPrivateKey recoveryPriKey = rsaUtil.generateRSAPrivateKey(priModBytes, priPriExpBytes);
+        byte[] requestData = byteKit.toByteArray(payRequest);
+        byte[] encryptData = rsaUtil.encrypt(recoveryPriKey,requestData);
+        String data = new String(encryptData);
         BaseResponseBean interResponse = httpRequest(payInsureUrl, data, interName);
+        logger.info("返回数据"+JsonKit.bean2Json(interResponse));
+        if(interResponse.code!=200){
+            return json(BaseResponseBean.CODE_FAILURE, interName + "接口请求失败", response);
+        }
+        Object result = interResponse.data;
+        byte[] returnResponse= byteKit.toByteArray(result);
+        byte[] decryptData = rsaUtil.decrypt(recoveryPubKey,returnResponse);
+        Object responseData = byteKit.toObject(decryptData);
+        if (responseData==null) {
+            return json(BaseResponseBean.CODE_FAILURE, interName + "接口返回报文解析失败", response);
+        }
         PayInsureBean.Response buyResponse = new PayInsureBean.Response();
+        response.data = responseData;
         return json(BaseResponseBean.CODE_FAILURE, "接口完善中。。。", response);
     }
 
@@ -150,6 +196,31 @@ public class IntersAction extends BaseAction {
      * @return
      */
     public String buyInsure(HttpServletRequest httpServletRequest) {
+        BuyInsureBean.Requset request = JsonKit.json2Bean(HttpKit.readRequestBody(httpServletRequest), BuyInsureBean.Requset.class);
+        BaseResponseBean response = new BaseResponseBean();
+        return json(BaseResponseBean.CODE_FAILURE, "接口完善中。。。", response);
+    }
+
+
+    /**
+     * 支付查询
+     *
+     * @param httpServletRequest
+     * @return
+     */
+    public String payQuery(HttpServletRequest httpServletRequest) {
+        BuyInsureBean.Requset request = JsonKit.json2Bean(HttpKit.readRequestBody(httpServletRequest), BuyInsureBean.Requset.class);
+        BaseResponseBean response = new BaseResponseBean();
+        return json(BaseResponseBean.CODE_FAILURE, "接口完善中。。。", response);
+    }
+
+    /**
+     * 支付通知(回调)
+     *
+     * @param httpServletRequest
+     * @return
+     */
+    public String payCallBack(HttpServletRequest httpServletRequest) {
         BuyInsureBean.Requset request = JsonKit.json2Bean(HttpKit.readRequestBody(httpServletRequest), BuyInsureBean.Requset.class);
         BaseResponseBean response = new BaseResponseBean();
         return json(BaseResponseBean.CODE_FAILURE, "接口完善中。。。", response);

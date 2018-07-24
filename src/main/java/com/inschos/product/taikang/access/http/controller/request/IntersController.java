@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletRequest;
  * 泰康产品对接：核保，缴费，撤保，承保
  */
 @Controller
-@RequestMapping("/api/taikang")
+@RequestMapping("/inter/")
 public class IntersController {
 
     private static final Logger logger = Logger.getLogger(IntersController.class);

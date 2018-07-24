@@ -62,6 +62,11 @@
       <artifactId>spring-test</artifactId>
       <version>4.3.11.RELEASE</version>
     </dependency>
+    <dependency>
+      <groupId>bouncycastle</groupId>
+      <artifactId>bcprov-jdk14</artifactId>
+      <version>140</version>
+    </dependency>
 
   </dependencies>
 
