@@ -24,7 +24,8 @@ public class HttpClientKit {
         if (client == null) {
             client = new OkHttpClient.Builder()
                     .retryOnConnectionFailure(true)
-                    .connectTimeout(30, TimeUnit.SECONDS)
+                    .connectTimeout(1000000, TimeUnit.SECONDS)
+                    .readTimeout(1000000, TimeUnit.SECONDS)
                     .build();
         }
         L.log.debug("==================================Request======================================");

@@ -1,4 +1,4 @@
-package com.inschos.product.taikang.access.rpc.action;
+package com.inschos.product.taikang.access.rpc.impl;
 
 import com.inschos.dock.api.InsureService;
 import com.inschos.dock.bean.*;
@@ -20,9 +20,9 @@ import java.util.List;
 import static com.inschos.product.taikang.access.rpc.bean.CommonBean.*;
 
 @Service
-public class IntersAction implements IntersService, InsureService {
+public class IntersImpl implements IntersService, InsureService {
 
-    private static final Logger logger = Logger.getLogger(IntersAction.class);
+    private static final Logger logger = Logger.getLogger(IntersImpl.class);
 
     private BaseResponseBean json(int code, String message, BaseResponseBean response) {
         if (response == null) {
