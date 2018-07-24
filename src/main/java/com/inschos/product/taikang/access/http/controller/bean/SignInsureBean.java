@@ -1,13 +1,24 @@
 package com.inschos.product.taikang.access.http.controller.bean;
 
+import sun.util.resources.cldr.lo.CalendarData_lo_LA;
+
 import java.util.List;
 
 /**
  * 核保和承保请求参数相同
  */
-public class BuyInsureBean {
+public class SignInsureBean {
 
     public static class Requset {
+        //业务参数
+        public String businessType;//业务系列,详见支付接口5.6
+        public String cmsSystemSource;//来源系统	,详见支付接口5.7
+        public String cmsPayTag;//支付方式,详见支付接口5.3
+        public String cmsPayChannel;//支付渠道,101：微信支付 102：支付宝支付 (访问查询接口时不作为查询依据)详见支付接口5.2
+        public String requestDateTime;//提交时间	,YYYY-MM-DD HH:MM:SS
+        public String cmsVersion;//调用接口版本,固定传1.0
+        public String cmsFormat;//传输参数格式,固定传JSON
+        public List<queryInfo> queryList;//查询集合
         //订单信息
         public String orderno;//随机生成,订单号小于等于20位
         public String orderfrom;//订单来源
@@ -51,6 +62,11 @@ public class BuyInsureBean {
         public String psit_code;//约定项编码
         public String psit_desc;//约定项描述
         public String psdt_value;//约定项值
+    }
+
+    public static class queryInfo{
+        public String sapCompanyCode;//SAP公司码	,只做记录，不作为查询依据
+        public String transactionId;//交易流水号	,业务系统交易流水号
     }
 
     public static class Response {

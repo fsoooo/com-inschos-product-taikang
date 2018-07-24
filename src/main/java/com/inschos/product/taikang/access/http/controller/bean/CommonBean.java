@@ -2,16 +2,15 @@ package com.inschos.product.taikang.access.http.controller.bean;
 
 public class CommonBean {
 
-    private static final String testOrgid = "5466";
-    private static final String testKey = "bfafa2d09dba76a7be9464c8";
-    private static final String testPlancode = "10100878";
-    private static final String testPeriod = "17";
-    private static final String testPremium = "20";
+    public static final int orgid = 5466;
+    public static final String key = "bfafa2d09dba76a7be9464c8";
+    public static final String plancode = "10100878";
+    public static final int period = 17;
+    public static final String premium = "20";
 
     //接口地址
-    private static final String insureUrl = "";//核保,缴费交易接口地址
-    private static final String cancelUrl = "";//撤单交易接口地址
-    private static final String insureSign = "";//签单交易接口地址
+    public static final String insureRequestUrl = "http://10.135.100.161:8080/soa/api/v1.0/service/E001";//核保
+    public static final String insureRequestSign = "http://10.135.100.161:8080/soa/api/v1.0/service/E002";//签单
 
     //性别(sex)
     public final static String man = "0";

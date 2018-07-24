@@ -1,6 +1,5 @@
 package com.inschos.product.taikang.access.http.controller.request;
 
-import com.inschos.product.taikang.access.http.controller.bean.ActionBean;
 import com.inschos.product.taikang.access.http.controller.action.IntersAction;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,45 +25,37 @@ public class IntersController {
 
     /**
      * 核保接口
-     * @param actionBean
+     *
+     * @param httpServletRequest
      * @return
      */
     @RequestMapping("/checkInsure/**")
     @ResponseBody
-    public String checkInsure(ActionBean actionBean) {
-        return intersAction.checkInsure(actionBean);
+    public String checkInsure(HttpServletRequest httpServletRequest) {
+        return intersAction.checkInsure(httpServletRequest);
     }
 
     /**
      * 缴费接口
-     * @param actionBean
+     *
+     * @param httpServletRequest
      * @return
      */
     @RequestMapping("/payInsure/**")
     @ResponseBody
-    public String payInsure(ActionBean actionBean) {
-        return intersAction.payInsure(actionBean);
-    }
-
-    /**
-     * 撤保接口
-     * @param actionBean
-     * @return
-     */
-    @RequestMapping("/cancelInsure/**")
-    @ResponseBody
-    public String cancelInsure(ActionBean actionBean) {
-        return intersAction.cancelInsure(actionBean);
+    public String payInsure(HttpServletRequest httpServletRequest) {
+        return intersAction.payInsure(httpServletRequest);
     }
 
     /**
      * 承保接口
-     * @param actionBean
+     *
+     * @param httpServletRequest
      * @return
      */
     @RequestMapping("/buyInsure/**")
     @ResponseBody
-    public String buyInsure(ActionBean actionBean) {
-        return intersAction.buyInsure(actionBean);
+    public String buyInsure(HttpServletRequest httpServletRequest) {
+        return intersAction.buyInsure(httpServletRequest);
     }
 }

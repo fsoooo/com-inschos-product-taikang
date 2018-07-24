@@ -4,7 +4,7 @@ public class PayInsureBean {
 
     public static class Requset {
         public String orderno;//订单号
-        public String orgid;//系统编码，由ECSM系统提供可由该字段识别销售机构
+        public int orgid;//系统编码，由ECSM系统提供可由该字段识别销售机构
         public String policyno;//保单号
     }
 

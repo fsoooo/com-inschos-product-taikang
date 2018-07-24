@@ -10,7 +10,6 @@ public class CommonBean {
 
     //接口地址
     public static final String insureUrl = "";//核保,缴费交易接口地址
-    public static final String cancelUrl = "";//撤单交易接口地址
     public static final String insureSign = "";//签单交易接口地址
 
     //性别(sex)

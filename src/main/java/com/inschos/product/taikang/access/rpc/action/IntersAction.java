@@ -4,7 +4,6 @@ import com.inschos.dock.api.InsureService;
 import com.inschos.dock.bean.*;
 import com.inschos.product.taikang.access.http.controller.bean.BaseResponseBean;
 import com.inschos.product.taikang.access.rpc.bean.BuyInsureBean;
-import com.inschos.product.taikang.access.rpc.bean.CancelInsureBean;
 import com.inschos.product.taikang.access.rpc.bean.PayInsureBean;
 import com.inschos.product.taikang.access.rpc.service.IntersService;
 import com.inschos.product.taikang.annotation.CheckParamsKit;
@@ -190,34 +189,7 @@ public class IntersAction implements IntersService, InsureService {
     }
 
     /**
-     * 撤保
-     *
-     * @param request
-     * @return
-     */
-    @Override
-    public BaseResponseBean cancelInsure(CancelInsureBean.Requset request) {
-        BaseResponseBean response = new BaseResponseBean();
-        String interName = "缴费接口";
-        if (request == null) {
-            return json(BaseResponseBean.CODE_FAILURE, interName + "参数解析失败", response);
-        }
-        CancelInsureBean.Requset cancelRequest = new CancelInsureBean.Requset();
-        cancelRequest.orderno = request.orderno;//订单号
-        cancelRequest.orderfrom = request.orderfrom;//订单来源
-        cancelRequest.plancode = request.plancode;//产品编码
-        cancelRequest.orgid = request.orgid;//系统编码
-        cancelRequest.policyno = request.policyno;//保单号
-        cancelRequest.insurename = request.insurename;//被保人姓名
-        cancelRequest.insurecid = request.insurecid;//被保人证件号码
-        String data = encryptUtil.getEncryptStr(testOrgid, JsonKit.bean2Json(cancelRequest));
-        BaseResponseBean interResponse = httpRequest(cancelUrl, data, interName);
-        PayInsureBean.Response buyResponse = new PayInsureBean.Response();
-        return response;
-    }
-
-    /**
-     * 撤保
+     * 承保
      *
      * @param request
      * @return
