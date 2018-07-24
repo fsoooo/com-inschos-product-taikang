@@ -9,9 +9,10 @@ public class CommonBean {
     public static final String premium = "20";
 
     //接口地址
-    public static final String checkInsureUrl = "http://10.135.100.161:8080/soa/api/v1.0/service/E001";//核保
-    public static final String payInsureUrl = "http://10.135.100.161:8080/soa/api/v1.0/service/04";//核保
-    public static final String signInsureUrl = "http://10.135.100.161:8080/soa/api/v1.0/service/E002";//签单
+    public static final String checkInsureUrl = "http://119.253.81.69:8080/soa/api/v1.0/service/E001";//核保
+    public static final String payInsureUrl = "http://119.253.81.69:8080/soa/api/v1.0/service/08";//支付
+    public static final String payQueryUrl = "http://119.253.81.69:8080/soa/api/v1.0/service/TQ08";//支付查询
+    public static final String signInsureUrl = "http://119.253.81.69:8080/soa/api/v1.0/service/E002";//签单
 
     //性别(sex)
     public final static String man = "0";
