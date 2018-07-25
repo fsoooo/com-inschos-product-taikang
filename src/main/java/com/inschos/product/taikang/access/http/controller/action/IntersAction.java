@@ -1,5 +1,10 @@
 package com.inschos.product.taikang.access.http.controller.action;
 
+import com.alibaba.druid.filter.encoding.CharsetConvert;
+import com.inschos.common.assist.kit.CharsetConvertKit;
+import com.inschos.common.assist.kit.HttpClientKit;
+import com.inschos.common.assist.kit.HttpKit;
+import com.inschos.common.assist.kit.JsonKit;
 import com.inschos.product.taikang.access.http.controller.bean.*;
 import com.inschos.product.taikang.assist.kit.*;
 import org.apache.log4j.Logger;
@@ -7,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
@@ -163,14 +169,23 @@ public class IntersAction extends BaseAction {
         payRequest.isRaw = "";
         payRequest.successURL = request.successURL;
         payRequest.failURL = "";
-
         RSAUtil rsaUtil = new RSAUtil();
         ByteKit byteKit = new ByteKit();
         RSAPublicKey recoveryPubKey = rsaUtil.generateRSAPublicKey(pubModBytes, pubPubExpBytes);
         RSAPrivateKey recoveryPriKey = rsaUtil.generateRSAPrivateKey(priModBytes, priPriExpBytes);
-        byte[] requestData = byteKit.toByteArray(payRequest);
-        byte[] encryptData = rsaUtil.encrypt(recoveryPriKey,requestData);
-        String data = new String(encryptData);
+
+        String json = JsonKit.bean2Json(payRequest);
+
+        String gbk = CharsetConvertKit.utf82gbk(json);
+
+        byte[] encryptData = rsaUtil.encrypt(recoveryPriKey,gbk.getBytes());
+        String data = null;
+        try {
+            data = new String(encryptData,"gbk");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        logger.info("请求数据"+data);
         BaseResponseBean interResponse = httpRequest(payInsureUrl, data, interName);
         logger.info("返回数据"+JsonKit.bean2Json(interResponse));
         if(interResponse.code!=200){

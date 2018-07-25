@@ -1,5 +1,6 @@
 package com.inschos.product.taikang.access.rpc.impl;
 
+import com.inschos.common.assist.kit.JsonKit;
 import com.inschos.dock.api.InsureService;
 import com.inschos.dock.bean.*;
 import com.inschos.product.taikang.access.http.controller.bean.BaseResponseBean;
@@ -7,17 +8,15 @@ import com.inschos.product.taikang.access.rpc.bean.BuyInsureBean;
 import com.inschos.product.taikang.access.rpc.bean.PayInsureBean;
 import com.inschos.product.taikang.access.rpc.service.IntersService;
 import com.inschos.product.taikang.annotation.CheckParamsKit;
-import com.inschos.product.taikang.assist.kit.HttpClientKit;
-import com.inschos.product.taikang.assist.kit.JsonKit;
 import com.inschos.product.taikang.assist.kit.encryptUtil;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.inschos.product.taikang.access.rpc.bean.CommonBean.*;
+import static com.inschos.product.taikang.access.rpc.bean.CommonBean.insureUrl;
+import static com.inschos.product.taikang.access.rpc.bean.CommonBean.testOrgid;
 
 @Service
 public class IntersImpl implements IntersService, InsureService {
@@ -47,25 +46,7 @@ public class IntersImpl implements IntersService, InsureService {
      */
     private BaseResponseBean httpRequest(String url, String json, String interName) {
         BaseResponseBean response = new BaseResponseBean();
-        if (interName == null) {
-            interName = "";
-        }
-        try {
-            String result = HttpClientKit.post(url, JsonKit.bean2Json(json));
-            if (result == null) {
-                return json(BaseResponseBean.CODE_FAILURE, interName + "接口请求失败", response);
-            }
-            if (!JsonKit.isJSONValid(result)) {
-                return json(BaseResponseBean.CODE_FAILURE, interName + "接口返回报文解析失败", response);
-            }
-            response = JsonKit.json2Bean(result, BaseResponseBean.class);
-            if (response.code != 200 || response.code == 500) {
-                return json(BaseResponseBean.CODE_FAILURE, interName + "接口服务请求失败", response);
-            }
-            return json(BaseResponseBean.CODE_SUCCESS, interName + "接口请求成功", response);
-        } catch (IOException e) {
-            return json(BaseResponseBean.CODE_FAILURE, interName + "接口请求失败", response);
-        }
+        return json(BaseResponseBean.CODE_FAILURE, interName + "接口请求失败", response);
     }
 
     /**

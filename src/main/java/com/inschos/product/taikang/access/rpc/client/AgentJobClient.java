@@ -1,9 +1,8 @@
 package com.inschos.product.taikang.access.rpc.client;
 
-import com.inschos.product.taikang.assist.kit.L;
+import com.inschos.common.assist.kit.L;
 import com.inschos.product.taikang.access.rpc.bean.AgentJobBean;
 import com.inschos.product.taikang.access.rpc.service.AgentJobService;
-import com.inschos.product.taikang.assist.kit.L;
 import hprose.client.HproseHttpClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

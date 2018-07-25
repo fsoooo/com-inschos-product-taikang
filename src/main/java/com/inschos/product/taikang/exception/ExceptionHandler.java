@@ -1,9 +1,8 @@
 package com.inschos.product.taikang.exception;
 
 
-import com.inschos.product.taikang.assist.kit.L;
+import com.inschos.common.assist.kit.L;
 import com.inschos.product.taikang.annotation.CheckParamsKit;
-import com.inschos.product.taikang.assist.kit.L;
 import org.apache.log4j.DefaultThrowableRenderer;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ModelAndView;

@@ -1,5 +1,8 @@
 package com.inschos.product.taikang.aop;
 
+import com.inschos.common.assist.kit.HttpKit;
+import com.inschos.common.assist.kit.JsonKit;
+import com.inschos.common.assist.kit.StringKit;
 import com.inschos.product.taikang.access.http.controller.bean.ActionBean;
 import com.inschos.product.taikang.access.http.controller.bean.BaseRequestBean;
 import com.inschos.product.taikang.access.http.controller.bean.BaseResponseBean;
@@ -8,9 +11,6 @@ import com.inschos.product.taikang.access.rpc.client.AccountClient;
 import com.inschos.product.taikang.annotation.CheckParamsKit;
 import com.inschos.product.taikang.annotation.GetActionBeanAnnotation;
 import com.inschos.product.taikang.assist.kit.ConstantKit;
-import com.inschos.product.taikang.assist.kit.HttpKit;
-import com.inschos.product.taikang.assist.kit.JsonKit;
-import com.inschos.product.taikang.assist.kit.StringKit;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;

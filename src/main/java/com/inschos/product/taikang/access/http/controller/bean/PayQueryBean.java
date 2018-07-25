@@ -1,10 +1,11 @@
 package com.inschos.product.taikang.access.http.controller.bean;
 
+import java.io.Serializable;
 import java.util.List;
 
 public class PayQueryBean {
 
-    public static class Requset {
+    public static class Requset  implements Serializable {
         public String businessType;//业务系列	个险，团险，银保
         public String cmsSystemSource;//来源系统
         public String cmsPayTag;//支付方式

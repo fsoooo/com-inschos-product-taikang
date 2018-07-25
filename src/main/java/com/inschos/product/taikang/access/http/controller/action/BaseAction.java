@@ -1,10 +1,9 @@
 package com.inschos.product.taikang.access.http.controller.action;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.inschos.product.taikang.assist.kit.StringKit;
+import com.inschos.common.assist.kit.JsonKit;
 import com.inschos.product.taikang.access.http.controller.bean.BaseResponseBean;
 import com.inschos.product.taikang.annotation.CheckParamsKit;
-import com.inschos.product.taikang.assist.kit.JsonKit;
 
 import java.io.IOException;
 import java.util.ArrayList;
