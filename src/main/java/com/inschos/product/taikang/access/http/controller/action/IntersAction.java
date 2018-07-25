@@ -1,12 +1,13 @@
 package com.inschos.product.taikang.access.http.controller.action;
 
-import com.alibaba.druid.filter.encoding.CharsetConvert;
 import com.inschos.common.assist.kit.CharsetConvertKit;
 import com.inschos.common.assist.kit.HttpClientKit;
 import com.inschos.common.assist.kit.HttpKit;
 import com.inschos.common.assist.kit.JsonKit;
 import com.inschos.product.taikang.access.http.controller.bean.*;
-import com.inschos.product.taikang.assist.kit.*;
+import com.inschos.product.taikang.assist.kit.ByteKit;
+import com.inschos.product.taikang.assist.kit.RSAUtil;
+import com.inschos.product.taikang.assist.kit.encryptUtil;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
@@ -40,18 +41,18 @@ public class IntersAction extends BaseAction {
             interName = "";
         }
         try {
-            logger.info(interName+"接口请求地址："+url);
-            logger.info(interName+"接口请求参数："+json);
+            logger.info(interName + "接口请求地址：" + url);
+            logger.info(interName + "接口请求参数：" + json);
             String result = HttpClientKit.post(url, JsonKit.bean2Json(json));
-            logger.info(interName+"接口返回数据："+result);
+            logger.info(interName + "接口返回数据：" + result);
             if (result == null) {
-                return responseBean(BaseResponseBean.CODE_FAILURE, interName + "接口请求失败1", response);
+                return responseBean(BaseResponseBean.CODE_FAILURE, interName + "接口请求失败,返回null", response);
             }
             response.data = result;
             return responseBean(BaseResponseBean.CODE_SUCCESS, interName + "接口请求成功", response);
         } catch (IOException e) {
             e.printStackTrace();
-            return responseBean(BaseResponseBean.CODE_FAILURE, interName + "接口请求失败2", response);
+            return responseBean(BaseResponseBean.CODE_FAILURE, interName + "接口请求失败,请求出错", response);
         }
     }
 
@@ -111,11 +112,11 @@ public class IntersAction extends BaseAction {
         List<BuyInsureBean.PolicySpldatas> policySpldatas = new ArrayList<>();
         policySpldatas.add(policySpldata);
         buyRequest.policyspldatas = policySpldatas;
+        //加解密处理,请求接口
         String requestData = JsonKit.bean2Json(buyRequest);
-        logger.info(interName+"请求数据："+requestData);
         String data = encryptUtil.getEncryptStr(key, requestData);
-        BaseResponseBean interResponse = httpRequest(checkInsureUrl, orgid+"|"+data, interName);
-        if(interResponse.code!=200){
+        BaseResponseBean interResponse = httpRequest(checkInsureUrl, orgid + "|" + data, interName);
+        if (interResponse.code != 200) {
             return json(BaseResponseBean.CODE_FAILURE, interName + "接口请求失败", response);
         }
         String result = interResponse.data.toString();
@@ -123,10 +124,17 @@ public class IntersAction extends BaseAction {
         if (!isJSONValid(result)) {
             return json(BaseResponseBean.CODE_FAILURE, interName + "接口返回报文解析失败", response);
         }
-        logger.info("返回数据"+JsonKit.bean2Json(interResponse));
-        BuyInsureBean.Response buyResponse = new BuyInsureBean.Response();
-        response.data = interResponse;
-        return json(BaseResponseBean.CODE_FAILURE, interName+"接口完善中。。。", response);
+        BuyInsureBean.Response buyResponse = JsonKit.json2Bean(result, BuyInsureBean.Response.class);
+        if (buyResponse != null) {
+            response.data = buyResponse;
+            if (buyResponse.status == "0") {
+                return json(BaseResponseBean.CODE_SUCCESS, interName + "成功", response);
+            } else {
+                return json(BaseResponseBean.CODE_SUCCESS, interName + "失败", response);
+            }
+        } else {
+            return json(BaseResponseBean.CODE_FAILURE, interName + "接口返回报文解析失败", response);
+        }
     }
 
     /**
@@ -169,39 +177,48 @@ public class IntersAction extends BaseAction {
         payRequest.isRaw = "";
         payRequest.successURL = request.successURL;
         payRequest.failURL = "";
+        //编码转换,加解密处理,请求接口
         RSAUtil rsaUtil = new RSAUtil();
         ByteKit byteKit = new ByteKit();
         RSAPublicKey recoveryPubKey = rsaUtil.generateRSAPublicKey(pubModBytes, pubPubExpBytes);
         RSAPrivateKey recoveryPriKey = rsaUtil.generateRSAPrivateKey(priModBytes, priPriExpBytes);
         String json = JsonKit.bean2Json(payRequest);
         String gbk = CharsetConvertKit.utf82gbk(json);
-        byte[] encryptData = rsaUtil.encrypt(recoveryPriKey,gbk.getBytes());
+        byte[] encryptData = rsaUtil.encrypt(recoveryPriKey, gbk.getBytes());
         String data = null;
         try {
-            data = new String(encryptData,"gbk");
+            data = new String(encryptData, "gbk");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
+            return json(BaseResponseBean.CODE_FAILURE, interName + "接口返回报文解析失败", response);
         }
-        logger.info("请求数据"+data);
         BaseResponseBean interResponse = httpRequest(payInsureUrl, data, interName);
-        logger.info("返回数据"+JsonKit.bean2Json(interResponse));
-        if(interResponse.code!=200){
+        if (interResponse.code != 200) {
             return json(BaseResponseBean.CODE_FAILURE, interName + "接口请求失败", response);
         }
         Object result = interResponse.data;
-        byte[] returnResponse= byteKit.toByteArray(result);
-        byte[] decryptData = rsaUtil.decrypt(recoveryPubKey,returnResponse);
+        byte[] returnResponse = byteKit.toByteArray(result);
+        byte[] decryptData = rsaUtil.decrypt(recoveryPubKey, returnResponse);
         Object responseData = byteKit.toObject(decryptData);
-        if (responseData==null) {
+        if (responseData == null) {
             return json(BaseResponseBean.CODE_FAILURE, interName + "接口返回报文解析失败", response);
         }
-        PayInsureBean.Response buyResponse = new PayInsureBean.Response();
-        response.data = responseData;
-        return json(BaseResponseBean.CODE_FAILURE, interName+"接口完善中。。。", response);
+        PayInsureBean.Response payResponse = JsonKit.json2Bean(JsonKit.bean2Json(responseData), PayInsureBean.Response.class);
+        if (payResponse != null) {
+            response.data = payResponse;
+            if (payResponse.responseCode == "3") {
+                return json(BaseResponseBean.CODE_SUCCESS, interName + "处理中", response);
+            } else if (payResponse.responseCode == "4") {
+                return json(BaseResponseBean.CODE_SUCCESS, interName + "处理成功", response);
+            } else if (payResponse.responseCode == "5") {
+                return json(BaseResponseBean.CODE_FAILURE, interName + "处理失败", response);
+            }
+        }
+        return json(BaseResponseBean.CODE_FAILURE, interName + "接口返回报文解析失败", response);
     }
 
     /**
-     * 承保
+     * 承保(参数分两部分,支付查询信息和订单信息)
      *
      * @param httpServletRequest
      * @return
@@ -213,6 +230,36 @@ public class IntersAction extends BaseAction {
         if (request == null) {
             return json(BaseResponseBean.CODE_FAILURE, interName + "参数解析失败", response);
         }
+        //TODO======================================支付查询信息=============================================
+        PayQueryBean.Requset payQueryRequest = new PayQueryBean.Requset();
+        payQueryRequest.businessType = request.businessType;//业务系列	个险，团险，银保
+        payQueryRequest.cmsSystemSource = request.cmsSystemSource;//来源系统
+        payQueryRequest.cmsPayTag = request.cmsPayTag;//支付方式
+        payQueryRequest.cmsPayChannel = request.cmsPayChannel;//支付渠道,101：微信支付 102：支付宝支付
+        payQueryRequest.requestDateTime = request.requestDateTime;//提交时间	,YYYY-MM-DD HH:MM:SS
+        payQueryRequest.cmsVersion = version;//调用接口版本	1.0
+        payQueryRequest.cmsFormat = format;//传输参数格式	JSON
+        PayQueryBean.QueryList queryList = new PayQueryBean.QueryList();
+        queryList.sapCompanyCode = "";
+        queryList.transactionId = "";
+        List<PayQueryBean.QueryList> queryLists = new ArrayList<>();
+        queryLists.add(queryList);
+        payQueryRequest.queryList = queryLists;//查询集合
+        RSAUtil rsaUtil = new RSAUtil();
+        ByteKit byteKit = new ByteKit();
+        RSAPublicKey recoveryPubKey = rsaUtil.generateRSAPublicKey(pubModBytes, pubPubExpBytes);
+        RSAPrivateKey recoveryPriKey = rsaUtil.generateRSAPrivateKey(priModBytes, priPriExpBytes);
+        String json = JsonKit.bean2Json(payQueryRequest);
+        String gbk = CharsetConvertKit.utf82gbk(json);
+        byte[] encryptData = rsaUtil.encrypt(recoveryPriKey, gbk.getBytes());
+        String payQueryData = null;
+        try {
+            payQueryData = new String(encryptData, "gbk");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return json(BaseResponseBean.CODE_FAILURE, interName + "参数处理失败", response);
+        }
+        //TODO======================================订单信息=============================================
         SignInsureBean.Requset signRequest = new SignInsureBean.Requset();
         //业务参数
         signRequest.businessType = request.businessType;//业务系列,详见支付接口5.6
@@ -271,11 +318,15 @@ public class IntersAction extends BaseAction {
         List<SignInsureBean.PolicySpldatas> policySpldatas = new ArrayList<>();
         policySpldatas.add(policySpldata);
         signRequest.policyspldatas = policySpldatas;
+        //加解密处理,请求接口
         String requestData = JsonKit.bean2Json(signRequest);
-        logger.info(interName+"请求数据："+requestData);
-        String data = encryptUtil.getEncryptStr(key, requestData);
-        BaseResponseBean interResponse = httpRequest(signInsureUrl, orgid+"|"+data, interName);
-        if(interResponse.code!=200){
+        String orderData = encryptUtil.getEncryptStr(key, requestData);
+        SignInsureBean.UnionRequest unionRequest = new SignInsureBean.UnionRequest();
+        unionRequest.order = orderData;
+        unionRequest.paymentQuery = payQueryData;
+        requestData = JsonKit.bean2Json(unionRequest);
+        BaseResponseBean interResponse = httpRequest(signInsureUrl, orgid + "|" + requestData, interName);
+        if (interResponse.code != 200) {
             return json(BaseResponseBean.CODE_FAILURE, interName + "接口请求失败", response);
         }
         String result = interResponse.data.toString();
@@ -283,10 +334,17 @@ public class IntersAction extends BaseAction {
         if (!isJSONValid(result)) {
             return json(BaseResponseBean.CODE_FAILURE, interName + "接口返回报文解析失败", response);
         }
-        logger.info("返回数据"+JsonKit.bean2Json(interResponse));
-        BuyInsureBean.Response buyResponse = new BuyInsureBean.Response();
-        response.data = interResponse;
-        return json(BaseResponseBean.CODE_FAILURE, interName+"接口完善中。。。", response);
+        SignInsureBean.Response signResponse = JsonKit.json2Bean(result, SignInsureBean.Response.class);
+        if (signResponse != null) {
+            response.data = signResponse;
+            if (signResponse.status == "0") {
+                return json(BaseResponseBean.CODE_SUCCESS, interName + "成功", response);
+            } else {
+                return json(BaseResponseBean.CODE_SUCCESS, interName + "失败", response);
+            }
+        } else {
+            return json(BaseResponseBean.CODE_FAILURE, interName + "接口返回报文解析失败", response);
+        }
     }
 
 
@@ -323,29 +381,38 @@ public class IntersAction extends BaseAction {
         RSAPrivateKey recoveryPriKey = rsaUtil.generateRSAPrivateKey(priModBytes, priPriExpBytes);
         String json = JsonKit.bean2Json(payQueryRequest);
         String gbk = CharsetConvertKit.utf82gbk(json);
-        byte[] encryptData = rsaUtil.encrypt(recoveryPriKey,gbk.getBytes());
+        byte[] encryptData = rsaUtil.encrypt(recoveryPriKey, gbk.getBytes());
         String data = null;
         try {
-            data = new String(encryptData,"gbk");
+            data = new String(encryptData, "gbk");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        logger.info("请求数据"+data);
+        logger.info("请求数据" + data);
         BaseResponseBean interResponse = httpRequest(payQueryUrl, data, interName);
-        logger.info("返回数据"+JsonKit.bean2Json(interResponse));
-        if(interResponse.code!=200){
+        logger.info("返回数据" + JsonKit.bean2Json(interResponse));
+        if (interResponse.code != 200) {
             return json(BaseResponseBean.CODE_FAILURE, interName + "接口请求失败", response);
         }
         Object result = interResponse.data;
-        byte[] returnResponse= byteKit.toByteArray(result);
-        byte[] decryptData = rsaUtil.decrypt(recoveryPubKey,returnResponse);
+        byte[] returnResponse = byteKit.toByteArray(result);
+        byte[] decryptData = rsaUtil.decrypt(recoveryPubKey, returnResponse);
         Object responseData = byteKit.toObject(decryptData);
-        if (responseData==null) {
+        if (responseData == null) {
             return json(BaseResponseBean.CODE_FAILURE, interName + "接口返回报文解析失败", response);
         }
-        PayInsureBean.Response buyResponse = new PayInsureBean.Response();
-        response.data = responseData;
-        return json(BaseResponseBean.CODE_FAILURE, interName+"接口完善中。。。", response);
+        PayQueryBean.Response payQueryResponse = JsonKit.json2Bean(JsonKit.bean2Json(responseData), PayQueryBean.Response.class);
+        if (payQueryResponse != null) {
+            response.data = payQueryResponse;
+            if (payQueryResponse.responseCode == "3") {
+                return json(BaseResponseBean.CODE_SUCCESS, interName + "处理中", response);
+            } else if (payQueryResponse.responseCode == "4") {
+                return json(BaseResponseBean.CODE_SUCCESS, interName + "处理成功", response);
+            } else if (payQueryResponse.responseCode == "5") {
+                return json(BaseResponseBean.CODE_FAILURE, interName + "处理失败", response);
+            }
+        }
+        return json(BaseResponseBean.CODE_FAILURE, interName + "接口返回报文解析失败", response);
     }
 
     /**
@@ -381,7 +448,7 @@ public class IntersAction extends BaseAction {
         baseResponse.responseCode = "";
         baseResponse.responseMessage = "";
         payCallBackResponse.baseResponse = baseResponse;//返回json子对象
-        return json(BaseResponseBean.CODE_FAILURE, interName+"接口完善中。。。", response);
+        return json(BaseResponseBean.CODE_FAILURE, interName + "接口完善中。。。", response);
     }
 
 

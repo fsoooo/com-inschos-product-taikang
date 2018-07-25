@@ -120,10 +120,10 @@ public class CommonBean {
         return result;
     }
 
-    //状态(status)
-    public static String getStatus(String statusCode){
+    //核保状态(insureStatusCode)
+    public static String getInsureStatus(String insureStatusCode){
         String result = "";
-        switch (statusCode) {
+        switch (insureStatusCode) {
             case "0":
                 result = "成功";
                 break;
@@ -146,10 +146,10 @@ public class CommonBean {
                 result = "保单存储失败，请重新提交";
                 break;
             case "1007":
-                result = "1001";
+                result = "订单处理中";
                 break;
             case "1008":
-                result = "26";
+                result = "订单未核保或核保失败（收费校验）";
                 break;
             case "1009":
                 result = "订单投保成功，请不要重复交易";
@@ -192,6 +192,65 @@ public class CommonBean {
                 break;
             case "1022":
                 result = "EBA保费测算结果与移动互联保费计算结果有出入，请核查 ";
+                break;
+        }
+        return result;
+    }
+
+    //支付状态(payStatusCode)
+    public static String getPayStatus(String payStatusCode){
+        String result = "";
+        switch (payStatusCode) {
+            case "1001":
+                result = "报文头格式无法解析";
+                break;
+            case "1002":
+                result = "报文格式有误";
+                break;
+            case "1005":
+                result = "客户编号不合法";
+                break;
+            case "1006":
+                result = "没有该渠道";
+                break;
+            case "1007":
+                result = "没有该交易类型";
+                break;
+            case "1014":
+                result = "交易指令号重复";
+                break;
+            case "1021":
+                result = "定义流程处理类不存在";
+                break;
+            case "1022":
+                result = "未定义处理流程类";
+                break;
+            case "1025":
+                result = "不存在需要处理的业务内容";
+                break;
+            case "1031":
+                result = "队列出现异常";
+                break;
+            case "1041":
+                result = "签名为空或者非法";
+                break;
+            case "9201":
+                result = "解析XML异常";
+                break;
+            case "9202":
+                result = "解析文件发生错误";
+                break;
+            case "9302":
+                result = "队列满载错误";
+                break;
+            case "9401":
+                result = "未找到业务处理类型异常";
+                break;
+            case "9988":
+                result = "渠道不支持";
+                break;
+            case "9999":
+                result = "未知错误";
                 break;
         }
         return result;

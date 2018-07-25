@@ -20,7 +20,7 @@ public class PayCallBackBean {
         public String openId;//	用户的访问ID,公众号支付时用的openid
     }
 
-    public static class BaseResponse{
+    public static class BaseResponse {
         public String responseCode;//受理返回码:3处理中,4处理成功,5处理失败
         public String responseMessage;//返回描述信息,获取支付串成功失败的描述
         public String requestDateTime;//请求时间,yyyy-mm-dd hh:mm:ss

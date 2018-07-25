@@ -1,13 +1,12 @@
 package com.inschos.product.taikang.access.http.controller.bean;
 
-import sun.util.resources.cldr.lo.CalendarData_lo_LA;
-
 import java.util.List;
 
-/**
- * 核保和承保请求参数相同
- */
 public class SignInsureBean {
+    public static class UnionRequest {
+        public String paymentQuery;//支付查询信息
+        public String order;//订单信息
+    }
 
     public static class Requset {
         //业务参数
@@ -58,13 +57,13 @@ public class SignInsureBean {
         public List<PolicySpldatas> policyspldatas;//特殊项字段
     }
 
-    public static class PolicySpldatas{
+    public static class PolicySpldatas {
         public String psit_code;//约定项编码
         public String psit_desc;//约定项描述
         public String psdt_value;//约定项值
     }
 
-    public static class queryInfo{
+    public static class queryInfo {
         public String sapCompanyCode;//SAP公司码	,只做记录，不作为查询依据
         public String transactionId;//交易流水号	,业务系统交易流水号
     }

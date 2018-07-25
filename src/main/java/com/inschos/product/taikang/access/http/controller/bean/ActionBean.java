@@ -1,12 +1,6 @@
 package com.inschos.product.taikang.access.http.controller.bean;
 
 
-import com.inschos.common.assist.kit.JsonKit;
-import com.inschos.common.assist.kit.L;
-import com.inschos.common.assist.kit.StringKit;
-import com.inschos.product.taikang.assist.kit.*;
-import com.inschos.product.taikang.assist.kit.*;
-
 public class ActionBean {
 
     private final static String SALT_VALUE_TEST = "InschosTest";

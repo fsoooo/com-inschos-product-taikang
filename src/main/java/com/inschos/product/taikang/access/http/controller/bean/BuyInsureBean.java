@@ -2,9 +2,6 @@ package com.inschos.product.taikang.access.http.controller.bean;
 
 import java.util.List;
 
-/**
- * 核保和承保请求参数相同
- */
 public class BuyInsureBean {
 
     public static class Requset {
