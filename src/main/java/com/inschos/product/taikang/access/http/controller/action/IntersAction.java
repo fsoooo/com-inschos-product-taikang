@@ -173,11 +173,8 @@ public class IntersAction extends BaseAction {
         ByteKit byteKit = new ByteKit();
         RSAPublicKey recoveryPubKey = rsaUtil.generateRSAPublicKey(pubModBytes, pubPubExpBytes);
         RSAPrivateKey recoveryPriKey = rsaUtil.generateRSAPrivateKey(priModBytes, priPriExpBytes);
-
         String json = JsonKit.bean2Json(payRequest);
-
         String gbk = CharsetConvertKit.utf82gbk(json);
-
         byte[] encryptData = rsaUtil.encrypt(recoveryPriKey,gbk.getBytes());
         String data = null;
         try {
@@ -324,10 +321,17 @@ public class IntersAction extends BaseAction {
         ByteKit byteKit = new ByteKit();
         RSAPublicKey recoveryPubKey = rsaUtil.generateRSAPublicKey(pubModBytes, pubPubExpBytes);
         RSAPrivateKey recoveryPriKey = rsaUtil.generateRSAPrivateKey(priModBytes, priPriExpBytes);
-        byte[] requestData = byteKit.toByteArray(payQueryRequest);
-        byte[] encryptData = rsaUtil.encrypt(recoveryPriKey,requestData);
-        String data = new String(encryptData);
-        BaseResponseBean interResponse = httpRequest(payInsureUrl, data, interName);
+        String json = JsonKit.bean2Json(payQueryRequest);
+        String gbk = CharsetConvertKit.utf82gbk(json);
+        byte[] encryptData = rsaUtil.encrypt(recoveryPriKey,gbk.getBytes());
+        String data = null;
+        try {
+            data = new String(encryptData,"gbk");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        logger.info("请求数据"+data);
+        BaseResponseBean interResponse = httpRequest(payQueryUrl, data, interName);
         logger.info("返回数据"+JsonKit.bean2Json(interResponse));
         if(interResponse.code!=200){
             return json(BaseResponseBean.CODE_FAILURE, interName + "接口请求失败", response);
