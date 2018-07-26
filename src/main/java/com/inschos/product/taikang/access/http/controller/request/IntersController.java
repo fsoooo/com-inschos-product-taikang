@@ -82,4 +82,29 @@ public class IntersController {
     public String payCallBack(HttpServletRequest httpServletRequest) {
         return intersAction.payCallBack(httpServletRequest);
     }
+
+    /**
+     * 交易退款
+     *
+     * @param httpServletRequest
+     * @return
+     */
+    @RequestMapping("/payRefund/**")
+    @ResponseBody
+    public String payRefund(HttpServletRequest httpServletRequest) {
+        return intersAction.payRefund(httpServletRequest);
+    }
+
+
+    /**
+     * 交易对账
+     *
+     * @param httpServletRequest
+     * @return
+     */
+    @RequestMapping("/payBill/**")
+    @ResponseBody
+    public String payBill(HttpServletRequest httpServletRequest) {
+        return intersAction.payBill(httpServletRequest);
+    }
 }
