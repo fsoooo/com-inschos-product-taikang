@@ -375,6 +375,7 @@ public class IntersAction extends BaseAction {
         List<PayQueryBean.QueryList> queryLists = new ArrayList<>();
         queryLists.add(queryList);
         payQueryRequest.queryList = queryLists;//查询集合
+        //编码转换,加解密处理,请求接口
         RSAUtil rsaUtil = new RSAUtil();
         ByteKit byteKit = new ByteKit();
         RSAPublicKey recoveryPubKey = rsaUtil.generateRSAPublicKey(pubModBytes, pubPubExpBytes);
@@ -449,6 +450,138 @@ public class IntersAction extends BaseAction {
         baseResponse.responseMessage = "";
         payCallBackResponse.baseResponse = baseResponse;//返回json子对象
         return json(BaseResponseBean.CODE_FAILURE, interName + "接口完善中。。。", response);
+    }
+
+    /**
+     * 交易退款
+     *
+     * @param httpServletRequest
+     * @return
+     */
+    public String payRefund(HttpServletRequest httpServletRequest) {
+        PayRefundBean.Requset request = JsonKit.json2Bean(HttpKit.readRequestBody(httpServletRequest), PayRefundBean.Requset.class);
+        BaseResponseBean response = new BaseResponseBean();
+        String interName = "交易退款";
+        if (request == null) {
+            return json(BaseResponseBean.CODE_FAILURE, interName + "参数解析失败", response);
+        }
+        PayRefundBean.Requset payRefundRequest = new PayRefundBean.Requset();
+        payRefundRequest.businessType = request.businessType;//业务系列	个险，团险，银保
+        payRefundRequest.cmsSystemSource = request.cmsSystemSource;//来源系统
+        payRefundRequest.cmsPayTag = request.cmsPayTag;//支付方式
+        payRefundRequest.cmsPayChannel = request.cmsPayChannel;//支付渠道,101：微信支付 102：支付宝支付
+        payRefundRequest.requestDateTime = request.requestDateTime;//提交时间	,YYYY-MM-DD HH:MM:SS
+        payRefundRequest.cmsVersion = version;//调用接口版本	1.0
+        payRefundRequest.cmsFormat = format;//传输参数格式	JSON
+        payRefundRequest.cmsBusinessType = request.cmsBusinessType;//业务类型
+        payRefundRequest.orderId = request.orderId;//商户订单号
+        payRefundRequest.money = request.money;//提交金额,本次退款金额,单位：分
+        payRefundRequest.sapCompanyCode = request.sapCompanyCode;//收款公司
+        payRefundRequest.transactionId = request.transactionId;//交易流水号
+        payRefundRequest.payTransactionId = request.payTransactionId;//支付平台交易流水号
+        payRefundRequest.channelTransactionId = request.channelTransactionId;//渠道交易流水号
+        payRefundRequest.mobileTransactionId = request.mobileTransactionId;//微信支付宝交易流水号
+        payRefundRequest.currencyCode = request.currencyCode;//币种,CNY
+        payRefundRequest.totalManey = request.totalManey;//交易总金额,收款时对应的订单金额，单位：分
+        payRefundRequest.summary = request.summary;//备注,商品交易信息描述
+        //编码转换,加解密处理,请求接口
+        RSAUtil rsaUtil = new RSAUtil();
+        ByteKit byteKit = new ByteKit();
+        RSAPublicKey recoveryPubKey = rsaUtil.generateRSAPublicKey(pubModBytes, pubPubExpBytes);
+        RSAPrivateKey recoveryPriKey = rsaUtil.generateRSAPrivateKey(priModBytes, priPriExpBytes);
+        String json = JsonKit.bean2Json(payRefundRequest);
+        String gbk = CharsetConvertKit.utf82gbk(json);
+        byte[] encryptData = rsaUtil.encrypt(recoveryPriKey, gbk.getBytes());
+        String data = null;
+        try {
+            data = new String(encryptData, "gbk");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        logger.info("请求数据" + data);
+        BaseResponseBean interResponse = httpRequest(payQueryUrl, data, interName);
+        logger.info("返回数据" + JsonKit.bean2Json(interResponse));
+        if (interResponse.code != 200) {
+            return json(BaseResponseBean.CODE_FAILURE, interName + "接口请求失败", response);
+        }
+        Object result = interResponse.data;
+        byte[] returnResponse = byteKit.toByteArray(result);
+        byte[] decryptData = rsaUtil.decrypt(recoveryPubKey, returnResponse);
+        Object responseData = byteKit.toObject(decryptData);
+        if (responseData == null) {
+            return json(BaseResponseBean.CODE_FAILURE, interName + "接口返回报文解析失败", response);
+        }
+        PayRefundBean.Response payRefundResponse = JsonKit.json2Bean(JsonKit.bean2Json(responseData), PayRefundBean.Response.class);
+        if (payRefundResponse != null) {
+            response.data = payRefundResponse;
+            if (payRefundResponse.responseCode == "3") {
+                return json(BaseResponseBean.CODE_SUCCESS, interName + "处理中", response);
+            } else if (payRefundResponse.responseCode == "4") {
+                return json(BaseResponseBean.CODE_SUCCESS, interName + "处理成功", response);
+            } else if (payRefundResponse.responseCode == "5") {
+                return json(BaseResponseBean.CODE_FAILURE, interName + "处理失败", response);
+            }
+        }
+        return json(BaseResponseBean.CODE_FAILURE, interName + "接口返回报文解析失败", response);
+    }
+
+
+    /**
+     * 交易对账
+     *
+     * @param httpServletRequest
+     * @return
+     */
+    public String payBill(HttpServletRequest httpServletRequest) {
+        PayBillBean.Requset request = JsonKit.json2Bean(HttpKit.readRequestBody(httpServletRequest), PayBillBean.Requset.class);
+        BaseResponseBean response = new BaseResponseBean();
+        String interName = "交易对账";
+        if (request == null) {
+            return json(BaseResponseBean.CODE_FAILURE, interName + "参数解析失败", response);
+        }
+        PayBillBean.Requset payQueryRequest = new PayBillBean.Requset();
+        payQueryRequest.businessType = request.businessType;//业务系列	个险，团险，银保
+        payQueryRequest.cmsSystemSource = request.cmsSystemSource;//来源系统
+        payQueryRequest.billDate = request.billDate;//对账日期
+        //编码转换,加解密处理,请求接口
+        RSAUtil rsaUtil = new RSAUtil();
+        ByteKit byteKit = new ByteKit();
+        RSAPublicKey recoveryPubKey = rsaUtil.generateRSAPublicKey(pubModBytes, pubPubExpBytes);
+        RSAPrivateKey recoveryPriKey = rsaUtil.generateRSAPrivateKey(priModBytes, priPriExpBytes);
+        String json = JsonKit.bean2Json(payQueryRequest);
+        String gbk = CharsetConvertKit.utf82gbk(json);
+        byte[] encryptData = rsaUtil.encrypt(recoveryPriKey, gbk.getBytes());
+        String data = null;
+        try {
+            data = new String(encryptData, "gbk");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        logger.info("请求数据" + data);
+        BaseResponseBean interResponse = httpRequest(payQueryUrl, data, interName);
+        logger.info("返回数据" + JsonKit.bean2Json(interResponse));
+        if (interResponse.code != 200) {
+            return json(BaseResponseBean.CODE_FAILURE, interName + "接口请求失败", response);
+        }
+        Object result = interResponse.data;
+        byte[] returnResponse = byteKit.toByteArray(result);
+        byte[] decryptData = rsaUtil.decrypt(recoveryPubKey, returnResponse);
+        Object responseData = byteKit.toObject(decryptData);
+        if (responseData == null) {
+            return json(BaseResponseBean.CODE_FAILURE, interName + "接口返回报文解析失败", response);
+        }
+        PayBillBean.Response paybillResponse = JsonKit.json2Bean(JsonKit.bean2Json(responseData), PayBillBean.Response.class);
+        if (paybillResponse != null) {
+            response.data = paybillResponse;
+            if (paybillResponse.responseCode == "3") {
+                return json(BaseResponseBean.CODE_SUCCESS, interName + "处理中", response);
+            } else if (paybillResponse.responseCode == "4") {
+                return json(BaseResponseBean.CODE_SUCCESS, interName + "处理成功", response);
+            } else if (paybillResponse.responseCode == "5") {
+                return json(BaseResponseBean.CODE_FAILURE, interName + "处理失败", response);
+            }
+        }
+        return json(BaseResponseBean.CODE_FAILURE, interName + "接口返回报文解析失败", response);
     }
 
 

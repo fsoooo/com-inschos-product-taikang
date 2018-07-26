@@ -10,11 +10,14 @@ public class CommonBean {
     public static final String version = "1.0";
     public static final String format = "JSON";
 
-    //接口地址
+    //核保、承保接口地址
     public static final String checkInsureUrl = "http://119.253.81.69:8080/soa/api/v1.0/service/E001";//核保
-    public static final String payInsureUrl = "http://119.253.81.69:8080/soa/api/v1.0/service/08";//支付
-    public static final String payQueryUrl = "http://119.253.81.69:8080/soa/api/v1.0/service/TQ08";//支付查询
     public static final String signInsureUrl = "http://119.253.81.69:8080/soa/api/v1.0/service/E002";//签单
+    //支付相关接口地址
+    public static final String payInsureUrl = "http://10.130.206.104:80/tk-financial-services/api/v1/mobile/transaction/payment/08";//支付
+    public static final String payRefundUrl = "http://10.130.206.104:80/tk-financial-services/api/v1/mobile/transaction/refund/08";//交易退款
+    public static final String payQueryUrl = "http://10.130.206.104:80/tk-financial-services/api/v1/mobile/transaction/queryTransaction/08";//支付查询
+    public static final String payBillUrl = "http://10.130.206.104:80/tk-financial-services/api/v1/mobile/transaction/getBillAddr/08";//获取对账单
 
     //性别(sex)
     public final static String man = "0";

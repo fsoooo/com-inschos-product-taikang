@@ -5,10 +5,10 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class RsaEncryBean {
-    public static final byte[] pubModBytes = getBytesFromFile("/encrypt/pubBPMMod.dat");
-    public static final byte[] pubPubExpBytes = getBytesFromFile("/encrypt/pubBPMExp.dat");
-    public static final byte[] priModBytes = getBytesFromFile("/encrypt/priBPMMod.dat");
-    public static final byte[] priPriExpBytes = getBytesFromFile("/encrypt/priBPMExp.dat");
+    public static final byte[] pubModBytes = getBytesFromFile("/encrypt/pubBPMOLMod.dat");
+    public static final byte[] pubPubExpBytes = getBytesFromFile("/encrypt/pubBPMOLExp.dat");
+    public static final byte[] priModBytes = getBytesFromFile("/encrypt/priBPMOLMod.dat");
+    public static final byte[] priPriExpBytes = getBytesFromFile("/encrypt/priBPMOLExp.dat");
 
     private static byte[] getBytesFromFile(String path) {
         byte[] ret = null;
