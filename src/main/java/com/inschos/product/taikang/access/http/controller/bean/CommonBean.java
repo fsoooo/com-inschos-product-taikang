@@ -5,7 +5,7 @@ public class CommonBean {
     public static final int orgid = 5466;
     public static final String key = "bfafa2d09dba76a7be9464c8";
     public static final String plancode = "10100878";
-    public static final int period = 17;
+    public static final int period = 7;
     public static final String premium = "20";
     public static final String version = "1.0";
     public static final String format = "JSON";
