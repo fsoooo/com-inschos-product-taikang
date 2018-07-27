@@ -128,10 +128,11 @@ public class IntersAction extends BaseAction {
         BuyInsureBean.Response buyResponse = JsonKit.json2Bean(result, BuyInsureBean.Response.class);
         if (buyResponse != null) {
             response.data = buyResponse;
+            logger.info("核保状态"+buyResponse.status);
             if (buyResponse.status == "0") {
                 return json(BaseResponseBean.CODE_SUCCESS, interName + "成功", response);
             } else {
-                return json(BaseResponseBean.CODE_SUCCESS, interName + "失败", response);
+                return json(BaseResponseBean.CODE_FAILURE, interName + "失败", response);
             }
         } else {
             return json(BaseResponseBean.CODE_FAILURE, interName + "接口返回报文解析失败", response);
