@@ -129,7 +129,7 @@ public class IntersAction extends BaseAction {
         if (buyResponse != null) {
             response.data = buyResponse;
             logger.info("核保状态:"+buyResponse.status);
-            if (buyResponse.status == "0") {
+            if (buyResponse.status == 0) {
                 return json(BaseResponseBean.CODE_SUCCESS, interName + "成功", response);
             } else {
                 return json(BaseResponseBean.CODE_FAILURE, interName + "失败", response);

@@ -51,7 +51,7 @@ public class BuyInsureBean {
     }
 
     public static class Response {
-        public String status;//投保状态	0 —成功；1— 失败
+        public int status;//投保状态	0 —成功；1— 失败
         public String desc;//失败原因,若成功则该值为空
         public String key;//返回校验码,若接入方无要求，则为空。
         public String orderno;//订单号
