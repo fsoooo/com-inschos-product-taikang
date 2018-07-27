@@ -43,8 +43,7 @@ public class IntersAction extends BaseAction {
         try {
             logger.info(interName + "接口请求地址：" + url);
             logger.info(interName + "接口请求参数：" + json);
-            String contentType = "text/xml;charset=UTF-8";
-            String result = HttpClientKit.post(url,contentType, JsonKit.bean2Json(json));
+            String result = HttpClientKit.post(url, json);
             logger.info(interName + "接口返回数据：" + result);
             if (result == null) {
                 return responseBean(BaseResponseBean.CODE_FAILURE, interName + "接口请求失败,返回null", response);
