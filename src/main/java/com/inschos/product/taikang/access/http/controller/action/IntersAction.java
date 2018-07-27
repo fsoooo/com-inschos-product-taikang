@@ -114,6 +114,7 @@ public class IntersAction extends BaseAction {
         buyRequest.policyspldatas = policySpldatas;
         //加解密处理,请求接口
         String requestData = JsonKit.bean2Json(buyRequest);
+        logger.info(interName + "接口请求json"+requestData);
         String data = encryptUtil.getEncryptStr(key, requestData);
         BaseResponseBean interResponse = httpRequest(checkInsureUrl, orgid + "|" + data, interName);
         if (interResponse.code != 200) {
@@ -183,6 +184,7 @@ public class IntersAction extends BaseAction {
         RSAPublicKey recoveryPubKey = rsaUtil.generateRSAPublicKey(pubModBytes, pubPubExpBytes);
         RSAPrivateKey recoveryPriKey = rsaUtil.generateRSAPrivateKey(priModBytes, priPriExpBytes);
         String json = JsonKit.bean2Json(payRequest);
+        logger.info(interName + "接口请求json"+json);
         String gbk = CharsetConvertKit.utf82gbk(json);
         byte[] encryptData = rsaUtil.encrypt(recoveryPriKey, gbk.getBytes());
         String data = null;
