@@ -6,6 +6,7 @@ public class PayQueryBean {
     public static class Requset {
         public String appId;//公众账号ID
         public String wspTradeNo;//支付流水号
+        public String sign;
     }
 
     public static class Response {

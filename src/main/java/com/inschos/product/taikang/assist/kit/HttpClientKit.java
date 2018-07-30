@@ -29,6 +29,10 @@ public class HttpClientKit {
         return post(url, body, client);
     }
 
+    public static String get(String url) throws IOException {
+        return get(url,client);
+    }
+
     public static String post(String url,  String body, List<HeaderBean.Header> headers) throws IOException {
         MediaType mediaType;
         mediaType = MediaType.parse("text/html;charset=UTF-8");
@@ -87,6 +91,21 @@ public class HttpClientKit {
         Request request = new Request.Builder()
                 .url(url)
                 .post(body)
+                .build();
+
+        Response response = client.newCall(request).execute();
+        String result = "";
+        ResponseBody responseBody = response.body();
+        if (responseBody != null) {
+            result = responseBody.string();
+        }
+        return result;
+    }
+
+    private static String get(String url, OkHttpClient client) throws IOException {
+        Request request = new Request.Builder()
+                .url(url)
+                .get()
                 .build();
 
         Response response = client.newCall(request).execute();

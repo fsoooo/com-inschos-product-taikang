@@ -43,13 +43,17 @@ public class IntersAction extends BaseAction {
             logger.info(interName + "接口请求地址：" + url);
             logger.info(interName + "接口请求参数：" + json);
             String result = "";
-            if (headers == null) {
-                result = HttpClientKit.post(url, json);
-            } else {
-                List<HeaderBean.Header> headerList = JsonKit.json2Bean(headers, new TypeReference<List<HeaderBean.Header>>() {
-                });
-                if (headerList != null && headerList.size() != 0) {
-                    result = HttpClientKit.post(url, json, headerList);
+            if(type=="get"){
+                result = HttpClientKit.get(url);
+            }else{
+                if (headers == null||headers.length()<=0) {
+                    result = HttpClientKit.post(url, json);
+                } else {
+                    List<HeaderBean.Header> headerList = JsonKit.json2Bean(headers, new TypeReference<List<HeaderBean.Header>>() {
+                    });
+                    if (headerList != null && headerList.size() != 0) {
+                        result = HttpClientKit.post(url, json, headerList);
+                    }
                 }
             }
             logger.info(interName + "接口返回数据：" + result);
@@ -66,7 +70,7 @@ public class IntersAction extends BaseAction {
 
     /**
      * 核保
-     *
+     * HTTP/POST请求
      * @param httpServletRequest
      * @return
      */
@@ -150,7 +154,7 @@ public class IntersAction extends BaseAction {
 
     /**
      * 承保(参数分两部分,支付查询信息和订单信息)
-     *
+     * HTTP/POST请求
      * @param httpServletRequest
      * @return
      */
@@ -286,48 +290,7 @@ public class IntersAction extends BaseAction {
         payRequest.limitPay = request.limitPay;//默认为支持信用卡支付，若需要禁止使用信用卡支付，limitPay=‘Y’
         payRequest.userCardId = request.userCardId;//支付人真实身份证件号	实名认证需要
         payRequest.userName = request.userName;//支付人真实姓名	实名认证需要
-
-        Field[] fields = payRequest.getClass().getFields();
-        List<String> list = new ArrayList<>();
-        Map<String,Object> map = new HashMap<>();
-
-        for (Field field : fields) {
-            if(field.isAccessible()){
-                String name = field.getName();
-                list.add(name);
-                try {
-                    Object  value = field.get(payRequest);
-                    map.put(name,value);
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        Collections.sort(list);
-
-        StringBuilder builder = new StringBuilder();
-        boolean isInit = true;
-        for (String s : list) {
-            if(isInit){
-                isInit = false;
-                builder.append("&");
-            }
-            builder.append(s).append("=").append(map.getOrDefault(s,""));
-        }
-        String string = builder.toString();
-
-        //TODO 加签处理
-        //TODO 1.将Sign之外所有值非空的字段，外加字段key，按照字段名（字母部分全部小写）的ASCII码值排序；
-        //TODO 2.将上述字段按照排列的顺序拼接成串，格式为key1=value1&key2=value2…
-        //TODO 3.MD5加密转换后的串；
-        //TODO 4.加密的串中的字母部分全部转成大写格式，得到的结果即为sign。
-
-        Map<String, Object> requsetMap = new HashMap<String, Object>();
-        requsetMap.put();
-
-        String requsetSign = PaySignKit.getSign(requsetMap,key);
-        payRequest.sign = requsetSign;//数字签名
+        payRequest.sign = getSign(payRequest,key);
         //设置header
         PayInsureBean.RequsetHeaders payRequestHeaders = new PayInsureBean.RequsetHeaders();
         payRequestHeaders.appId = request.appId;
@@ -335,9 +298,23 @@ public class IntersAction extends BaseAction {
         payRequestHeaders.channel = "zx";
         String headerSign = MD5Kit.MD5Digest("appid="+request.appId+"&channel=zx&paymode=wx&key="+key);
         payRequestHeaders.sign = headerSign;//将appId、payMode及key拼接成如示例所示的串：appid=XXXX&channel=XXXX&paymode=XXXX&key=XXXX,然后经过MD5签名后所得的值
-
-
-        return json(BaseResponseBean.CODE_FAILURE, interName + "接口返回报文解析失败", response);
+        //http请求
+        BaseResponseBean interResponse = httpRequest(payInsureUrlTest, JsonKit.bean2Json(payRequest), interName, JsonKit.bean2Json(payRequestHeaders),"post");
+        if (interResponse==null||interResponse.code != 200) {
+            return json(BaseResponseBean.CODE_FAILURE, interName + "接口请求失败", response);
+        }
+        String result = interResponse.data.toString();
+        PayInsureBean.Response payResponse = JsonKit.json2Bean(result, PayInsureBean.Response.class);
+        if (payResponse != null) {
+            response.data = payResponse;
+            if (payResponse.rspCode == "200") {
+                return json(BaseResponseBean.CODE_SUCCESS, interName + "成功", response);
+            } else {
+                return json(BaseResponseBean.CODE_FAILURE, interName + "失败", response);
+            }
+        } else {
+            return json(BaseResponseBean.CODE_FAILURE, interName + "接口返回报文解析失败", response);
+        }
     }
 
     /**
@@ -355,8 +332,23 @@ public class IntersAction extends BaseAction {
             return json(BaseResponseBean.CODE_FAILURE, interName + "参数解析失败", response);
         }
         PayQueryBean.Requset payQueryRequest = new PayQueryBean.Requset();
-
-        return json(BaseResponseBean.CODE_FAILURE, interName + "接口返回报文解析失败", response);
+        payQueryRequest.appId = request.appId;
+        payQueryRequest.wspTradeNo = request.wspTradeNo;
+        payQueryRequest.sign = getSign(payQueryRequest,key);
+        //http请求
+        String requestUrl = payQueryUrlTest+"appId="+payQueryRequest.appId+"&wspTradeNo="+payQueryRequest.wspTradeNo+"&sign="+payQueryRequest.sign;
+        BaseResponseBean interResponse = httpRequest(requestUrl, "",interName, "","get");
+        if (interResponse==null||interResponse.code != 200) {
+            return json(BaseResponseBean.CODE_FAILURE, interName + "接口请求失败", response);
+        }
+        String result = interResponse.data.toString();
+        PayInsureBean.Response payResponse = JsonKit.json2Bean(result, PayInsureBean.Response.class);
+        if (payResponse != null) {
+            response.data = payResponse;
+                return json(BaseResponseBean.CODE_SUCCESS, interName + "成功", response);
+        } else {
+            return json(BaseResponseBean.CODE_FAILURE, interName + "接口返回报文解析失败", response);
+        }
     }
 
     /**
@@ -386,6 +378,48 @@ public class IntersAction extends BaseAction {
         payCallBackResponse.rspDesc = "处理失败";
         response.data = payCallBackResponse;
         return json(BaseResponseBean.CODE_FAILURE, interName + "接口完善中。。。", response);
+    }
+
+    /**
+     * 获取sign
+     * @param data
+     * @param keySign
+     * @return
+     */
+    private String getSign(Object data,String keySign){
+        //TODO 加签处理
+        //TODO 1.将Sign之外所有值非空的字段，外加字段key，按照字段名（字母部分全部小写）的ASCII码值排序；
+        //TODO 2.将上述字段按照排列的顺序拼接成串，格式为key1=value1&key2=value2…
+        //TODO 3.MD5加密转换后的串；
+        //TODO 4.加密的串中的字母部分全部转成大写格式，得到的结果即为sign。
+        Field[] fields = data.getClass().getFields();
+        List<String> list = new ArrayList<>();
+        Map<String,Object> map = new HashMap<>();
+        for (Field field : fields) {
+            if(field.isAccessible()){
+                String name = field.getName();
+                list.add(name);
+                try {
+                    Object  value = field.get(data);
+                    map.put(name,value);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        Collections.sort(list);
+        StringBuilder builder = new StringBuilder();
+        boolean isInit = true;
+        for (String s : list) {
+            if(isInit){
+                isInit = false;
+                builder.append("&");
+            }
+            builder.append(s).append("=").append(map.getOrDefault(s,""));
+        }
+        String string = builder.toString();
+        String sign = MD5Kit.MD5Digest(string+"&key="+keySign).toUpperCase();
+        return sign;
     }
 
 }
