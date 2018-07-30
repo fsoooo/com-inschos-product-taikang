@@ -14,14 +14,23 @@ public class CommonBean {
     public static final String checkInsureUrl = "http://119.253.81.69:8080/soa/api/v1.0/service/E001";//核保
     public static final String signInsureUrl = "http://119.253.81.69:8080/soa/api/v1.0/service/E002";//签单
     //支付相关接口地址
-    public static final String payInsureUrl = "http://10.130.206.104:80/tk-financial-services/api/v1/mobile/transaction/payment/08";//支付
-    public static final String payRefundUrl = "http://10.130.206.104:80/tk-financial-services/api/v1/mobile/transaction/refund/08";//交易退款
-    public static final String payQueryUrl = "http://10.130.206.104:80/tk-financial-services/api/v1/mobile/transaction/queryTransaction/08";//支付查询
-    public static final String payBillUrl = "http://10.130.206.104:80/tk-financial-services/api/v1/mobile/transaction/getBillAddr/08";//获取对账单
-
+    public static final String payInsureUrlTest = "http://wxpt-t.taikang.com/tkmap/wechat/wxpay/order.do";//支付-测试
+    public static final String payInsureUrlProduct = "http://wxpt.taikang.com/tkmap/wechat/wxpay/order.do";//支付-生产
+    public static final String payQueryUrlTest = "http://wxpt-t.taikang.com/tkmap/wechat/wxpay/orderQuery.do?appId=appId&wspTradeNo=wspTradeNo";//支付查询-测试
+    public static final String payQueryUrlProduct = "http://wxpt.taikang.com/tkmap/wechat/wxpay/orderQuery.do?appId=appId&wspTradeNo=wspTradeNo";//支付查询-生产
     //性别(sex)
     public final static String man = "0";
     public final static String woman = "1";
+    //证件类型(idType)
+    public final static String idCard = "01";
+    public final static String corporateCode = "02";
+    public final static String passport = "03";
+    public final static String officer = "04";
+    public final static String macauPass = "05";
+    public final static String taiwanPass = "06";
+    public final static String idTypeBirth = "07";
+    public final static String otherIdType = "10";
+
     public static String getSex(String sexType) {
         String result = "";
         switch (sexType) {
@@ -35,15 +44,6 @@ public class CommonBean {
         return result;
     }
 
-    //证件类型(idType)
-    public final static String idCard = "01";
-    public final static String corporateCode = "02";
-    public final static String passport = "03";
-    public final static String officer = "04";
-    public final static String macauPass = "05";
-    public final static String taiwanPass = "06";
-    public final static String idTypeBirth = "07";
-    public final static String otherIdType = "10";
     public static String getIdType(String idType) {
         String result = "";
         switch (idType) {
@@ -76,7 +76,7 @@ public class CommonBean {
     }
 
     //关系(relation)
-    public static String getRelation(String relation){
+    public static String getRelation(String relation) {
         String result = "";
         switch (relation) {
             case "本人":
@@ -124,7 +124,7 @@ public class CommonBean {
     }
 
     //核保状态(insureStatusCode)
-    public static String getInsureStatus(String insureStatusCode){
+    public static String getInsureStatus(String insureStatusCode) {
         String result = "";
         switch (insureStatusCode) {
             case "0":
@@ -195,65 +195,6 @@ public class CommonBean {
                 break;
             case "1022":
                 result = "EBA保费测算结果与移动互联保费计算结果有出入，请核查 ";
-                break;
-        }
-        return result;
-    }
-
-    //支付状态(payStatusCode)
-    public static String getPayStatus(String payStatusCode){
-        String result = "";
-        switch (payStatusCode) {
-            case "1001":
-                result = "报文头格式无法解析";
-                break;
-            case "1002":
-                result = "报文格式有误";
-                break;
-            case "1005":
-                result = "客户编号不合法";
-                break;
-            case "1006":
-                result = "没有该渠道";
-                break;
-            case "1007":
-                result = "没有该交易类型";
-                break;
-            case "1014":
-                result = "交易指令号重复";
-                break;
-            case "1021":
-                result = "定义流程处理类不存在";
-                break;
-            case "1022":
-                result = "未定义处理流程类";
-                break;
-            case "1025":
-                result = "不存在需要处理的业务内容";
-                break;
-            case "1031":
-                result = "队列出现异常";
-                break;
-            case "1041":
-                result = "签名为空或者非法";
-                break;
-            case "9201":
-                result = "解析XML异常";
-                break;
-            case "9202":
-                result = "解析文件发生错误";
-                break;
-            case "9302":
-                result = "队列满载错误";
-                break;
-            case "9401":
-                result = "未找到业务处理类型异常";
-                break;
-            case "9988":
-                result = "渠道不支持";
-                break;
-            case "9999":
-                result = "未知错误";
                 break;
         }
         return result;
