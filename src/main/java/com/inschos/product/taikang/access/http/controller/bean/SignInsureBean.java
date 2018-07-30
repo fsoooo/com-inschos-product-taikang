@@ -4,7 +4,8 @@ import java.util.List;
 
 public class SignInsureBean {
     public static class UnionRequest {
-        public String paymentQuery;//支付查询信息
+        public String appId;//公众账号id
+        public String wspTradeNo;//支付流水号
         public String order;//订单信息
     }
 

@@ -233,36 +233,6 @@ public class IntersAction extends BaseAction {
         if (request == null) {
             return json(BaseResponseBean.CODE_FAILURE, interName + "参数解析失败", response);
         }
-        //TODO======================================支付查询信息=============================================
-        PayQueryBean.Requset payQueryRequest = new PayQueryBean.Requset();
-        payQueryRequest.businessType = request.businessType;//业务系列	个险，团险，银保
-        payQueryRequest.cmsSystemSource = request.cmsSystemSource;//来源系统
-        payQueryRequest.cmsPayTag = request.cmsPayTag;//支付方式
-        payQueryRequest.cmsPayChannel = request.cmsPayChannel;//支付渠道,101：微信支付 102：支付宝支付
-        payQueryRequest.requestDateTime = request.requestDateTime;//提交时间	,YYYY-MM-DD HH:MM:SS
-        payQueryRequest.cmsVersion = version;//调用接口版本	1.0
-        payQueryRequest.cmsFormat = format;//传输参数格式	JSON
-        PayQueryBean.QueryList queryList = new PayQueryBean.QueryList();
-        queryList.sapCompanyCode = "";
-        queryList.transactionId = "";
-        List<PayQueryBean.QueryList> queryLists = new ArrayList<>();
-        queryLists.add(queryList);
-        payQueryRequest.queryList = queryLists;//查询集合
-        RSAUtil rsaUtil = new RSAUtil();
-        ByteKit byteKit = new ByteKit();
-        RSAPublicKey recoveryPubKey = rsaUtil.generateRSAPublicKey(pubModBytes, pubPubExpBytes);
-        RSAPrivateKey recoveryPriKey = rsaUtil.generateRSAPrivateKey(priModBytes, priPriExpBytes);
-        String json = JsonKit.bean2Json(payQueryRequest);
-        String gbk = CharsetConvertKit.utf82gbk(json);
-        byte[] encryptData = rsaUtil.encrypt(recoveryPriKey, gbk.getBytes());
-        String payQueryData = null;
-        try {
-            payQueryData = new String(encryptData, "gbk");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            return json(BaseResponseBean.CODE_FAILURE, interName + "参数处理失败", response);
-        }
-        //TODO======================================订单信息=============================================
         SignInsureBean.Requset signRequest = new SignInsureBean.Requset();
         //业务参数
         signRequest.businessType = request.businessType;//业务系列,详见支付接口5.6
@@ -324,9 +294,11 @@ public class IntersAction extends BaseAction {
         //加解密处理,请求接口
         String requestData = JsonKit.bean2Json(signRequest);
         String orderData = encryptUtil.getEncryptStr(key, requestData);
+        //TODO 核保参数未凑齐
         SignInsureBean.UnionRequest unionRequest = new SignInsureBean.UnionRequest();
         unionRequest.order = orderData;
-        unionRequest.paymentQuery = payQueryData;
+        unionRequest.appId = "公众账号id";
+        unionRequest.wspTradeNo = "支付流水号";
         requestData = JsonKit.bean2Json(unionRequest);
         BaseResponseBean interResponse = httpRequest(signInsureUrl, orgid + "|" + requestData, interName);
         if (interResponse.code != 200) {
