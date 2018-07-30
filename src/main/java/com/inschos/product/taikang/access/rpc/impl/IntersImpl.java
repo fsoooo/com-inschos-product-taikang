@@ -8,7 +8,7 @@ import com.inschos.product.taikang.access.rpc.bean.BuyInsureBean;
 import com.inschos.product.taikang.access.rpc.bean.PayInsureBean;
 import com.inschos.product.taikang.access.rpc.service.IntersService;
 import com.inschos.product.taikang.annotation.CheckParamsKit;
-import com.inschos.product.taikang.assist.kit.encryptUtil;
+import com.inschos.product.taikang.assist.kit.EncryptUtil;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
@@ -127,7 +127,7 @@ public class IntersImpl implements IntersService, InsureService {
         List<BuyInsureBean.PolicySpldatas> policySpldatas = new ArrayList<>();
         policySpldatas.add(policySpldata);
         buyRequest.policyspldatas = policySpldatas;
-        String data = encryptUtil.getEncryptStr(testOrgid, JsonKit.bean2Json(buyRequest));
+        String data = EncryptUtil.getEncryptStr(testOrgid, JsonKit.bean2Json(buyRequest));
         BaseResponseBean interResponse = httpRequest(insureUrl, data, interName);
         BuyInsureBean.Response buyResponse = new BuyInsureBean.Response();
         return response;
@@ -152,7 +152,7 @@ public class IntersImpl implements IntersService, InsureService {
         payRequest.orderno = request.aplNo;
         payRequest.orgid = testOrgid;
         payRequest.policyno = request.aplNo;
-        String data = encryptUtil.getEncryptStr(testOrgid, JsonKit.bean2Json(payRequest));
+        String data = EncryptUtil.getEncryptStr(testOrgid, JsonKit.bean2Json(payRequest));
         BaseResponseBean interResponse = httpRequest(insureUrl, data, interName);
         PayInsureBean.Response buyResponse = new PayInsureBean.Response();
         return response;
@@ -234,7 +234,7 @@ public class IntersImpl implements IntersService, InsureService {
         List<BuyInsureBean.PolicySpldatas> policySpldatas = new ArrayList<>();
         policySpldatas.add(policySpldata);
         buyRequest.policyspldatas = policySpldatas;
-        String data = encryptUtil.getEncryptStr(testOrgid, JsonKit.bean2Json(buyRequest));
+        String data = EncryptUtil.getEncryptStr(testOrgid, JsonKit.bean2Json(buyRequest));
         BaseResponseBean interResponse = httpRequest(insureUrl, data, interName);
         BuyInsureBean.Response buyResponse = new BuyInsureBean.Response();
         return response;

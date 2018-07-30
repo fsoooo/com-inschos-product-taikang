@@ -8,9 +8,9 @@ import javax.crypto.spec.SecretKeySpec;
 /**
  * 加密信息类
  */
-public class encryptUtil {
+public class EncryptUtil {
 
-    private static final Logger LOG = Logger.getLogger(encryptUtil.class.getName());
+    private static final Logger LOG = Logger.getLogger(EncryptUtil.class.getName());
 
     private static final String ALGORITHM = "DESede";
 
@@ -27,11 +27,11 @@ public class encryptUtil {
             c1.init(Cipher.ENCRYPT_MODE, deskey);
             return c1.doFinal(src);
         } catch (java.security.NoSuchAlgorithmException e1) {
-            LOG.info("-encryptUtil---encryptStr error:" + e1);
+            LOG.info("-EncryptUtil---encryptStr error:" + e1);
         } catch (javax.crypto.NoSuchPaddingException e2) {
-            LOG.info("--encryptUtil--encryptStr error:" + e2);
+            LOG.info("--EncryptUtil--encryptStr error:" + e2);
         } catch (java.lang.Exception e3) {
-            LOG.info("--encryptUtil--encryptStr error:" + e3);
+            LOG.info("--EncryptUtil--encryptStr error:" + e3);
         }
         return null;
     }
@@ -50,11 +50,11 @@ public class encryptUtil {
             return c1.doFinal(src);
 
         } catch (java.security.NoSuchAlgorithmException e1) {
-            LOG.info("-encryptUtil---decryptStr error:" + e1);
+            LOG.info("-EncryptUtil---decryptStr error:" + e1);
         } catch (javax.crypto.NoSuchPaddingException e2) {
-            LOG.info("--encryptUtil--decryptStr error:" + e2);
+            LOG.info("--EncryptUtil--decryptStr error:" + e2);
         } catch (java.lang.Exception e3) {
-            LOG.info("--encryptUtil--decryptStr error:" + e3);
+            LOG.info("--EncryptUtil--decryptStr error:" + e3);
         }
         return null;
     }
@@ -69,7 +69,7 @@ public class encryptUtil {
                 returnBuffer.append(hexToAscii((buffer[pos] >>> 4) & 0x0F)).append(hexToAscii(buffer[pos] & 0x0F));
             }
         } catch (Exception e) {
-            LOG.info("--encryptUtil--toString error:" + e);
+            LOG.info("--EncryptUtil--toString error:" + e);
             throw new RuntimeException("后端加密异常，请检查数据格式！");
         }
         return returnBuffer.toString();
@@ -94,7 +94,7 @@ public class encryptUtil {
                 buffer[pos++] = (byte) ((asciiToHex(inHex.charAt(ptr++)) << 4) | (asciiToHex(inHex.charAt(ptr++))));
             }
         } catch (Exception e) {
-            LOG.info("--encryptUtil--fromString error:" + e);
+            LOG.info("--EncryptUtil--fromString error:" + e);
             throw new RuntimeException("后端解密异常，请检查数据格式！");
         }
 

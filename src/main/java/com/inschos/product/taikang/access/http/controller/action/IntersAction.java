@@ -1,13 +1,13 @@
 package com.inschos.product.taikang.access.http.controller.action;
 
 import com.inschos.common.assist.kit.CharsetConvertKit;
-import com.inschos.common.assist.kit.HttpClientKit;
+import com.inschos.product.taikang.assist.kit.HttpClientKit;
 import com.inschos.common.assist.kit.HttpKit;
 import com.inschos.common.assist.kit.JsonKit;
 import com.inschos.product.taikang.access.http.controller.bean.*;
 import com.inschos.product.taikang.assist.kit.ByteKit;
+import com.inschos.product.taikang.assist.kit.EncryptUtil;
 import com.inschos.product.taikang.assist.kit.RSAUtil;
-import com.inschos.product.taikang.assist.kit.encryptUtil;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
@@ -115,13 +115,13 @@ public class IntersAction extends BaseAction {
         //加解密处理,请求接口
         String requestData = JsonKit.bean2Json(buyRequest);
         logger.info(interName + "接口请求json"+requestData);
-        String data = encryptUtil.getEncryptStr(key, requestData);
+        String data = EncryptUtil.getEncryptStr(key, requestData);
         BaseResponseBean interResponse = httpRequest(checkInsureUrl, orgid + "|" + data, interName);
         if (interResponse.code != 200) {
             return json(BaseResponseBean.CODE_FAILURE, interName + "接口请求失败", response);
         }
         String result = interResponse.data.toString();
-        result = encryptUtil.getDecryptStr(key, result);
+        result = EncryptUtil.getDecryptStr(key, result);
         if (!isJSONValid(result)) {
             return json(BaseResponseBean.CODE_FAILURE, interName + "接口返回报文解析失败", response);
         }
@@ -293,7 +293,7 @@ public class IntersAction extends BaseAction {
         signRequest.policyspldatas = policySpldatas;
         //加解密处理,请求接口
         String requestData = JsonKit.bean2Json(signRequest);
-        String orderData = encryptUtil.getEncryptStr(key, requestData);
+        String orderData = EncryptUtil.getEncryptStr(key, requestData);
         //TODO 核保参数未凑齐
         SignInsureBean.UnionRequest unionRequest = new SignInsureBean.UnionRequest();
         unionRequest.order = orderData;
@@ -305,7 +305,7 @@ public class IntersAction extends BaseAction {
             return json(BaseResponseBean.CODE_FAILURE, interName + "接口请求失败", response);
         }
         String result = interResponse.data.toString();
-        result = encryptUtil.getDecryptStr(key, result);
+        result = EncryptUtil.getDecryptStr(key, result);
         if (!isJSONValid(result)) {
             return json(BaseResponseBean.CODE_FAILURE, interName + "接口返回报文解析失败", response);
         }
